@@ -1,214 +1,106 @@
-/* A modern, minimal but rich stylesheet. Uses CSS variables for quick theming. */
 body {
     margin: 0;
-    background: linear-gradient(180deg, #071028 0%, #071622 100%);
-    color: #e6eef8;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    padding: 0;
+    background-color: #000;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
 }
-
 
 .container {
-    max-width: var(--max-width);
-    padding: 0 var(--container-padding);
-    margin: 0 auto;
+    text-align: center;
+    animation: fadeIn 2s ease-in-out;
 }
 
-
-.site-header {
-    position: sticky;
-    top: 0;
-    background: transparent;
-    padding: 18px 0;
-    z-index: 40
+.title {
+    font-size: 4em;
+    letter-spacing: 2px;
+    animation: glow 2s infinite alternate;
 }
 
-.header-inner {
+.tagline {
+    font-size: 1.5em;
+    margin: 20px 0;
+    opacity: 0;
+    animation: fadeUp 2s ease forwards;
+    animation-delay: 1s;
+}
+
+.cta {
+    padding: 12px 24px;
+    font-size: 1em;
+    background-color: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.cta:hover {
+    transform: scale(1.1);
+    background-color: #f5f5f5;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px #fff, 0 0 20px #0ff; }
+    to { text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
+}
+
+.gallery {
+    margin-top: 50px;
+    text-align: center;
+    animation: fadeIn 2s ease-in-out;
+}
+
+.gallery h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.sneaker-grid {
     display: flex;
-    align-items: center;
-    justify-content: space-between
-}
-
-.brand {
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.4px
-}
-
-.brand .accent {
-    background: var(--accent);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent
-}
-
-
-.nav a {
-    color: var(--muted);
-    text-decoration: none;
-    margin-left: 22px;
-    font-weight: 600
-}
-
-.nav .cta {
-    padding: 8px 14px;
-    border-radius: 10px;
-    background: linear-gradient(90deg, #6C5CE7, #00B894);
-    color: #fff
-}
-
-
-.hero {
-    padding: 72px 0
-}
-
-.hero-inner {
-    display: flex;
-    gap: 48px;
-    align-items: center
-}
-
-.hero-copy {
-    flex: 1;
-    max-width: 640px
-}
-
-.hero h1 {
-    font-size: 48px;
-    line-height: 1.02;
-    margin: 0 0 12px
-}
-
-.hero .accent {
-    background: var(--accent);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent
-}
-
-.lead {
-    color: var(--muted);
-    font-size: 18px;
-    margin-bottom: 20px
-}
-
-.hero-ctas {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 22px
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
     justify-content: center;
-    padding: 12px 18px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 700
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.btn.primary {
-    background: linear-gradient(90deg, #6C5CE7, #00B894);
-    color: #fff
-}
-
-.btn.ghost {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: #e6eef8
-}
-
-.btn.small {
-    padding: 8px 12px;
-    border-radius: 10px
-}
-
-
-.metrics {
-    display: flex;
-    gap: 18px;
-    margin-top: 14px
-}
-
-.metric {
-    background: var(--glass);
-    padding: 10px 14px;
-    border-radius: 12px;
-    text-align: center
-}
-
-.metric .num {
-    font-weight: 800;
-    font-size: 18px
-}
-
-.metric .label {
-    color: var(--muted);
-    font-size: 13px
-}
-
-
-.hero-visual {
-    flex: 0 0 420px;
-    border-radius: 20px;
+.sneaker-card {
+    width: 300px;
+    height: 300px;
     overflow: hidden;
-    box-shadow: 0 20px 50px rgba(2, 6, 23, 0.6)
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+    animation: fadeUp 1.5s ease forwards;
 }
 
-
-.section {
-    padding: 64px 0
+.sneaker-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
-.section.alt {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent)
+.sneaker-card:hover {
+    transform: scale(1.05);
 }
 
-.section-title {
-    font-size: 26px;
-    margin-bottom: 22px
+.sneaker-card:hover img {
+    transform: scale(1.1);
 }
-
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px
-}
-
-.feature {
-    background: rgba(255, 255, 255, 0.02);
-    padding: 20px;
-    border-radius: 12px
-}
-
-.feature h3 {
-    margin: 0 0 8px
-}
-
-.feature p {
-    margin: 0;
-    color: var(--muted)
-}
-
-.feature-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.03);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px
-}
-
-
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px
-}
-
-.course-card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02),

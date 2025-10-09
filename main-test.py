@@ -1,36 +1,18 @@
-"""Pytest suite for validating the Flask app homepage."""
+import unittest
+from main import app
 
-import pytest
-from datetime import datetime
-from app import app
+class NikeSneakersAppTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
 
-@pytest.fixture
-def client():
-    """Create a test client for the Flask app."""
-    app.config['TESTING'] = True
-    with app.test_client() as test_client:
-        yield test_client
+    def test_home_page_status_code(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
 
-def test_home_status_code(client):
-    """Ensure the home route returns HTTP 200."""
-    response = client.get('/')
-    assert response.status_code == 200
+    def test_home_page_content(self):
+        response = self.client.get('/')
+        self.assertIn(b'NIKE Sneakers', response.data)
+        self.assertIn(b'Step into the future of style and performance.', response.data)
 
-def test_home_template_data(client):
-    """Verify homepage content includes expected features, metrics, and current year."""
-    response = client.get('/')
-    html = response.data.decode()
-
-    # Feature titles
-    assert "Personalized Learning" in html
-    assert "World-class Mentors" in html
-    assert "Hands-on Projects" in html
-
-    # Metrics
-    assert "1M+" in html
-    assert "2K+" in html
-    assert "150+" in html
-
-    # Current year
-    current_year = str(datetime.now().year)
-    assert current_year in html
+if __name__ == '__main__':
+    unittest.main()

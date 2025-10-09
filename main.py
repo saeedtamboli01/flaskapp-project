@@ -1,12 +1,10 @@
-"""Entry point for running the Flask app with configurable port."""
+from flask import Flask, render_template
 
-import os
-from app import app
+app = Flask(__name__)
 
-def main():
-    """Run the Flask app on the specified host and port."""
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True)
