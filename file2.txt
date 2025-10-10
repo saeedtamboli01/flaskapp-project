@@ -1,0 +1,2 @@
+hey hii !
+      i am from file2 just to testing the how can jenkins auto trigred .
