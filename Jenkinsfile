@@ -1,4 +1,5 @@
 pipeline {
+
     agent none
 
     environment {
@@ -14,74 +15,55 @@ pipeline {
     stages {
 
         /* ---------------------------------------------------------
-            CHECKOUT – ALWAYS ON JENKINS MASTER
+            1. CHECKOUT SOURCE CODE (MASTER NODE)
         ----------------------------------------------------------*/
         stage('Checkout Code') {
             agent { label 'built-in' }
             steps {
-                echo "Checking out source code..."
-
-                // FIXED → correct branch
+                echo "Pulling code from GitHub..."
                 git branch: 'master',
                     url: 'https://github.com/saeedtamboli01/flaskapp-project.git'
 
                 stash name: 'source_code', includes: '**'
-                echo "Source code stashed."
+                echo "Source code stashed successfully."
             }
         }
 
 
         /* ---------------------------------------------------------
-            RUN PYTESTS – ALWAYS ON BUILD AGENT
+            2. RUN PYTESTS (BUILD-NODE)
         ----------------------------------------------------------*/
-        stage('Run PyTests') {
+        stage('Run Unit Tests') {
             agent { label 'build-node' }
             steps {
                 unstash 'source_code'
 
                 sh '''
-                    echo "Checking Python3..."
-                    if ! command -v python3 &> /dev/null
-                    then
-                        echo "Python3 NOT found. Installing..."
-
-                        # Alpine Linux (inside Docker)
-                        if command -v apk &> /dev/null; then
-                            apk update
-                            apk add --no-cache python3 py3-pip python3-dev
-                        fi
-
-                        # Ubuntu / Debian
-                        if command -v apt-get &> /dev/null; then
-                            apt-get update -y
-                            apt-get install -y python3 python3-pip python3-venv
-                        fi
-                    fi
-
-                    echo "Python version:"
-                    python3 --version
-
                     echo "Creating virtual environment..."
                     python3 -m venv venv
+
+                    echo "Activating virtual environment..."
                     . venv/bin/activate
 
-                    echo "Installing dependencies..."
+                    echo "Installing Python dependencies..."
                     pip install --upgrade pip
-                    pip install -r requirements.txt || pip install flask pytest
+                    pip install -r requirements.txt
+                    pip install pytest pytest-cov
 
                     echo "Running tests..."
-                    pytest -v --junitxml=test-results.xml || true
-
+                    pytest -v --junitxml=test-results.xml
                 '''
-
-                junit 'test-results.xml'
-                echo "Tests completed successfully."
+            }
+            post {
+                always {
+                    junit 'test-results.xml'
+                }
             }
         }
 
 
         /* ---------------------------------------------------------
-            BUILD & PUSH DOCKER IMAGE
+            3. BUILD & PUSH DOCKER IMAGE (BUILD-NODE)
         ----------------------------------------------------------*/
         stage('Build & Push Docker Image') {
             agent { label 'build-node' }
@@ -101,23 +83,25 @@ pipeline {
                     echo "Pushing versioned image..."
                     docker push $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_VERSION
 
-                    echo "Tagging & pushing latest..."
+                    echo "Tagging latest..."
                     docker tag $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_VERSION \
                                $DOCKERHUB_USER/$IMAGE_NAME:latest
+
+                    echo "Pushing latest tag..."
                     docker push $DOCKERHUB_USER/$IMAGE_NAME:latest
 
-                    echo "Cleaning Docker cache..."
+                    echo "Cleaning Docker build cache..."
                     docker system prune -af || true
                 '''
 
-                echo "Docker image build & push complete."
+                echo "Docker Image pushed successfully."
             }
         }
 
 
-        /* -----------------------------------------------------------
-            DEPLOY – ALWAYS ON DEPLOYMENT AGENT
-        -----------------------------------------------------------*/
+        /* ---------------------------------------------------------
+            4. DEPLOY TO SERVER (DEPLOY-NODE)
+        ----------------------------------------------------------*/
         stage('Deploy to Server') {
             agent { label 'deploy-node' }
             steps {
@@ -128,7 +112,7 @@ pipeline {
                     echo "Pulling latest image..."
                     docker pull $DOCKERHUB_USER/$IMAGE_NAME:latest
 
-                    echo "Stopping existing container..."
+                    echo "Stopping old container..."
                     docker stop flask-app || true
                     docker rm flask-app || true
 
@@ -138,9 +122,18 @@ pipeline {
                         -p 5000:5000 \
                         $DOCKERHUB_USER/$IMAGE_NAME:latest
 
-                    echo "Deployment completed!"
+                    echo "Deployment successful!"
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo "PIPELINE SUCCESS ✔️"
+        }
+        failure {
+            echo "PIPELINE FAILED ❌ Fix your code or config."
         }
     }
 }
