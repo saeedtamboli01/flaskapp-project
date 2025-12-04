@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKERHUB_USER = 'saeed126'
         IMAGE_NAME     = 'flaskapp'
-        DOCKERHUB_PASS = credentials('flaskapp')
+        DOCKERHUB_PASS = credentials('Dockerhub-cred')
     }
 
     options {
