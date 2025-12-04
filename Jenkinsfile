@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_USER = 'saeed126'
-        IMAGE_NAME     = 'flask-app'
+        IMAGE_NAME     = 'flaskapp'
         DOCKERHUB_PASS = credentials('flaskapp')
     }
 
@@ -20,7 +20,9 @@ pipeline {
             agent { label 'built-in' }
             steps {
                 echo "Checking out source code..."
-                git branch: 'main',
+
+                // FIXED → correct branch
+                git branch: 'master',
                     url: 'https://github.com/saeedtamboli01/flaskapp-project.git'
 
                 stash name: 'source_code', includes: '**'
@@ -43,7 +45,7 @@ pipeline {
                     then
                         echo "Python3 NOT found. Installing..."
 
-                        # Alpine Linux (DIND)
+                        # Alpine Linux (inside Docker)
                         if command -v apk &> /dev/null; then
                             apk update
                             apk add --no-cache python3 py3-pip python3-dev
@@ -98,12 +100,12 @@ pipeline {
                     echo "Pushing versioned image..."
                     docker push $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_VERSION
 
-                    echo "Pushing latest tag..."
+                    echo "Tagging & pushing latest..."
                     docker tag $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_VERSION \
                                $DOCKERHUB_USER/$IMAGE_NAME:latest
                     docker push $DOCKERHUB_USER/$IMAGE_NAME:latest
 
-                    echo "Cleaning up..."
+                    echo "Cleaning Docker cache..."
                     docker system prune -af || true
                 '''
 
