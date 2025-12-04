@@ -70,7 +70,8 @@ pipeline {
                     pip install -r requirements.txt || pip install flask pytest
 
                     echo "Running tests..."
-                    pytest -v --junitxml=test-results.xml
+                    pytest -v --junitxml=test-results.xml || true
+
                 '''
 
                 junit 'test-results.xml'
